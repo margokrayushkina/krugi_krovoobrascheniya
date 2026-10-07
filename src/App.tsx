@@ -9,7 +9,10 @@ function App() {
   const [screen, setScreen] = useState<Screen>('simulation');
 
   return (
-    <div className="w-full h-full bg-gradient-to-b from-[#1a1a2e] to-[#16213e] overflow-hidden">
+    <div 
+      className="w-full h-full bg-gradient-to-b from-[#1a1a2e] to-[#16213e] overflow-hidden"
+      style={{ width: '100%', height: '100%', minHeight: '100vh', overflow: 'hidden' }}
+    >
       {screen === 'simulation' && (
         <BodySimulation 
           onOpenGlossary={() => setScreen('glossary')} 

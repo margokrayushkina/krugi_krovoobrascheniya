@@ -190,15 +190,19 @@ export function BodySimulation({ onOpenGlossary, onOpenQuiz }: BodySimulationPro
 
   // Heartbeat sound
   const playHeartbeat = useCallback(() => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-    }
-    const ctx = audioContextRef.current;
-    // Resume AudioContext if suspended (browser autoplay policy)
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
-    const now = ctx.currentTime;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioCtx();
+      }
+      const ctx = audioContextRef.current;
+      // Resume AudioContext if suspended (browser autoplay policy)
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      const now = ctx.currentTime;
     
     const osc1 = ctx.createOscillator();
     const gain1 = ctx.createGain();
@@ -223,6 +227,9 @@ export function BodySimulation({ onOpenGlossary, onOpenQuiz }: BodySimulationPro
     gain2.connect(ctx.destination);
     osc2.start(now + 0.2);
     osc2.stop(now + 0.35);
+    } catch (e) {
+      console.warn('Audio playback failed:', e);
+    }
   }, []);
 
   useEffect(() => {
