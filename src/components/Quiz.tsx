@@ -15,23 +15,26 @@ export function Quiz({ onBack }: QuizProps) {
   const question = quizQuestions[currentQuestion];
 
   const handleOrganClick = useCallback((organId: string) => {
-    if (feedback === 'correct') return;
+    // Блокируем любые нажатия при правильном ответе или во время показа ошибки
+    if (feedback === 'correct' || feedback === 'wrong') return;
     
     const newOrder = [...selectedOrder, organId];
-    setSelectedOrder(newOrder);
-
-    // Check if this is the correct next step
     const expectedIndex = newOrder.length - 1;
+
+    // Проверяем, правильный ли это шаг
     if (question.correctOrder[expectedIndex] !== organId) {
+      // Неправильный ответ: НЕ добавляем элемент, сразу показываем ошибку
       setFeedback('wrong');
       setTimeout(() => {
         setFeedback(null);
-        setSelectedOrder(newOrder.slice(0, -1)); // Remove wrong selection
       }, 1500);
       return;
     }
 
-    // Check if all steps are completed
+    // Правильный шаг — добавляем в порядок
+    setSelectedOrder(newOrder);
+
+    // Проверяем, все ли шаги завершены
     if (newOrder.length === question.correctOrder.length) {
       setFeedback('correct');
       setScore(s => s + 1);
@@ -148,15 +151,18 @@ export function Quiz({ onBack }: QuizProps) {
             {question.organIds.map(organId => {
               const isSelected = selectedOrder.includes(organId);
               const organ = organData[organId];
+              const isLocked = feedback === 'correct' || feedback === 'wrong';
               return (
                 <button
                   key={organId}
                   onClick={() => handleOrganClick(organId)}
-                  disabled={isSelected || feedback === 'correct'}
+                  disabled={isSelected || isLocked}
                   className={`p-3 md:p-4 rounded-xl font-semibold text-sm md:text-base transition-all min-h-[44px] ${
                     isSelected 
                       ? 'bg-blue-700/50 text-blue-300 border-2 border-blue-500/50 opacity-60'
-                      : 'bg-gray-700/70 hover:bg-gray-600/70 text-white border-2 border-gray-500/30 hover:border-blue-400/50 hover:scale-105'
+                      : isLocked
+                        ? 'bg-gray-700/70 text-gray-400 border-2 border-gray-500/30 opacity-60 cursor-not-allowed'
+                        : 'bg-gray-700/70 hover:bg-gray-600/70 text-white border-2 border-gray-500/30 hover:border-blue-400/50 hover:scale-105'
                   }`}
                 >
                   {organ?.name || organId}

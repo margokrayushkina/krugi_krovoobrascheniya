@@ -31,7 +31,7 @@ export function Glossary({ onBack }: GlossaryProps) {
   };
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3e] to-[#0d1b2a]">
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-gradient-to-b from-[#0a0a1a] via-[#1a1a3e] to-[#0d1b2a]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-8 py-4 bg-[#0d1b2a]/80 border-b border-blue-500/30">
         <h1 className="text-xl md:text-3xl font-bold text-white">📖 Словарь терминов</h1>

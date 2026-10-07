@@ -194,6 +194,10 @@ export function BodySimulation({ onOpenGlossary, onOpenQuiz }: BodySimulationPro
       audioContextRef.current = new AudioContext();
     }
     const ctx = audioContextRef.current;
+    // Resume AudioContext if suspended (browser autoplay policy)
+    if (ctx.state === 'suspended') {
+      ctx.resume();
+    }
     const now = ctx.currentTime;
     
     const osc1 = ctx.createOscillator();
@@ -223,7 +227,6 @@ export function BodySimulation({ onOpenGlossary, onOpenQuiz }: BodySimulationPro
 
   useEffect(() => {
     if (soundEnabled && !isPaused) {
-      playHeartbeat();
       heartbeatIntervalRef.current = setInterval(() => {
         if (!isPausedRef.current) {
           playHeartbeat();
@@ -233,6 +236,7 @@ export function BodySimulation({ onOpenGlossary, onOpenQuiz }: BodySimulationPro
     return () => {
       if (heartbeatIntervalRef.current) {
         clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
       }
     };
   }, [soundEnabled, isPaused, playHeartbeat]);
